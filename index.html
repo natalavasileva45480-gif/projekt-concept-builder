@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#667eea">
+<meta name="author" content="Prompt Constructor">
+
+<meta property="og:title" content="Конструктор промптов для плана воспитательной работы">
+<meta property="og:description" content="Быстро создавайте промпты для нейросетей по ФГОС/ФООП/ФРПВ. Экономьте время классного руководителя!">
+<meta property="og:image" content="https://via.placeholder.com/512x512/667eea/ffffff?text=План+Воспитательной+Работы">
+<meta property="og:type" content="website">
+
+<title>Конструктор промптов — План воспитательной работы</title>
+
+<script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  .preview, .preview * {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+  input, textarea, select {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+
+  html, body { overscroll-behavior: none; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Tahoma, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 12px;
+    padding-bottom: 40px;
+    color: #333;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 900px) {
+    .container { grid-template-columns: 1fr; }
+    body { padding: 8px; padding-bottom: 40px; }
+    h1 { font-size: 20px; margin-bottom: 12px; }
+    .panel { padding: 16px; }
+    .checkbox-group { grid-template-columns: 1fr; max-height: 180px; }
+    .row { grid-template-columns: 1fr; }
+    .btn-group { flex-direction: column; }
+    button { width: 100%; }
+  }
+  .panel {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    position: relative;
+  }
+  .panel::after {
+    content: "🎓 Prompt Constructor · 2026";
+    position: absolute;
+    bottom: 6px;
+    right: 12px;
+    font-size: 10px;
+    color: rgba(102, 126, 234, 0.4);
+    pointer-events: none;
+    font-style: italic;
+    letter-spacing: 0.3px;
+  }
+  h1 {
+    color: #fff;
+    text-align: center;
+    margin-bottom: 16px;
+    font-size: 22px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  h2 {
+    color: #4a5568;
+    margin-bottom: 14px;
+    font-size: 17px;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 8px;
+  }
+  .field { margin-bottom: 14px; }
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #2d3748;
+    font-size: 14px;
+  }
+  select, input[type="text"], input[type="number"], textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.2s;
+    font-family: inherit;
+    background: #fff;
+  }
+  select:focus, input:focus, textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+  }
+  textarea { resize: vertical; min-height: 60px; }
+  .checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+    background: #f7fafc;
+    padding: 12px;
+    border-radius: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 400;
+    font-size: 13px;
+    margin: 0;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+  }
+  .checkbox-group label:active { background: #edf2f7; }
+  .checkbox-group input[type="checkbox"] {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+  button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex: 1;
+    min-width: 140px;
+    touch-action: manipulation;
+  }
+  button:active { transform: scale(0.97); }
+  .btn-primary { background: #667eea; color: #fff; }
+  .btn-secondary { background: #48bb78; color: #fff; }
+  .btn-danger { background: #f56565; color: #fff; }
+  .btn-copy { background: #ed8936; color: #fff; }
+  .preview {
+    background: #f7fafc;
+    border: 2px dashed #cbd5e0;
+    border-radius: 8px;
+    padding: 14px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    max-height: 500px;
+    overflow-y: auto;
+    color: #2d3748;
+    -webkit-overflow-scrolling: touch;
+  }
+  .hint {
+    font-size: 12px;
+    color: #718096;
+    margin-top: 4px;
+    font-style: italic;
+  }
+  .tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .tab {
+    padding: 8px 14px;
+    background: #edf2f7;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .tab.active { background: #667eea; color: #fff; }
+  .section { display: none; }
+  .section.active { display: block; }
+  .counter {
+    display: inline-block;
+    background: #667eea;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    margin-left: 6px;
+  }
+  .toast {
+    position: fixed;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #48bb78;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 24px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 1000;
+    font-size: 14px;
+    font-weight: 600;
+    max-width: 90%;
+    text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .vk-header {
+    background: rgba(255,255,255,0.15);
+    padding: 8px 14px;
+    border-radius: 20px;
+    text-align: center;
+    color: #fff;
+    font-size: 12px;
+    margin-bottom: 12px;
+    backdrop-filter: blur(10px);
+  }
+  .info-block {
+    background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%);
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    border-left: 4px solid #667eea;
+  }
+  .info-block h3 {
+    font-size: 14px;
+    color: #4c51bf;
+    margin-bottom: 10px;
+  }
+  .credit-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 6px 12px;
+    text-align: center;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.7);
+    z-index: 998;
+    font-style: italic;
+    letter-spacing: 0.3px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .credit-bar span { opacity: 0.85; }
+</style>
+</head>
+<body>
+
+<div class="vk-header">🎓 Конструктор промптов для плана воспитательной работы</div>
+
+<h1>📝 Создайте промпт за 2 минуты</h1>
+
+<div class="container">
+  <div class="panel">
+    <h2>📋 Параметры плана</h2>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="basic">Основные</div>
+      <div class="tab" data-tab="fop">ФГОС/ФООП</div>
+      <div class="tab" data-tab="region">Регион и даты</div>
+      <div class="tab" data-tab="extras">Дополнительно</div>
+    </div>
+
+    <div class="section active" id="basic">
+      <div class="info-block">
+        <h3>👤 Информация об учителе и школе</h3>
+        <div class="field">
+          <label>ФИО классного руководителя</label>
+          <input type="text" id="teacherName" placeholder="Иванова Мария Петровна">
+        </div>
+        <div class="field">
+          <label>Полное название школы / ОО</label>
+          <input type="text" id="schoolName" placeholder="МБОУ «СОШ № 15» г. Самары">
+          <div class="hint">Укажите полностью — это поможет нейросети учесть тип учреждения</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Тип плана (период)</label>
+        <select id="planType">
+          <option value="quarter">Четверть</option>
+          <option value="halfyear">Полугодие</option>
+          <option value="trimester">Триместр</option>
+          <option value="year">Учебный год</option>
+          <option value="month">Месяц</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Номер периода</label>
+          <select id="periodNum">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Учебный год (начало)</label>
+          <input type="number" id="yearStart" value="2026" min="2020" max="2035">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Класс</label>
+          <select id="grade">
+            <option value="1">1</option><option value="2">2</option>
+            <option value="3">3</option><option value="4">4</option>
+            <option value="5" selected>5</option><option value="6">6</option>
+            <option value="7">7</option><option value="8">8</option>
+            <option value="9">9</option><option value="10">10</option>
+            <option value="11">11</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Буква класса</label>
+          <input type="text" id="gradeLetter" placeholder="А, Б, В..." maxlength="2">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Уровень ФГОС</label>
+        <select id="fgosLevel">
+          <option value="НОО">НОО (1–4 классы)</option>
+          <option value="ООО" selected>ООО (5–9 классы)</option>
+          <option value="СОО">СОО (10–11 классы)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="section" id="fop">
+      <div class="field">
+        <label>Личностные результаты ФГОС <span class="counter" id="cntPersonal">0</span></label>
+        <div class="checkbox-group" id="personalResults">
+          <label><input type="checkbox" value="гражданственность"> гражданственность</label>
+          <label><input type="checkbox" value="патриотизм"> патриотизм</label>
+          <label><input type="checkbox" value="уважение к закону"> уважение к закону</label>
+          <label><input type="checkbox" value="уважение к Родине"> уважение к Родине</label>
+          <label><input type="checkbox" value="уважение к семье"> уважение к семье</label>
+          <label><input type="checkbox" value="экологическая культура"> экологическая культура</label>
+          <label><input type="checkbox" value="трудолюбие"> трудолюбие</label>
+          <label><input type="checkbox" value="ценности ЗОЖ"> ценности ЗОЖ</label>
+          <label><input type="checkbox" value="эстетическое развитие"> эстетическое развитие</label>
+          <label><input type="checkbox" value="коммуникативность"> коммуникативность</label>
+          <label><input type="checkbox" value="критическое мышление"> критическое мышление</label>
+          <label><input type="checkbox" value="цифровая грамотность"> цифровая грамотность</label>
+        </div>
+        <div class="hint">Если ничего не выбрано — будет указано «все направления»</div>
+      </div>
+
+      <div class="field">
+        <label>Модули ФРПВ <span class="counter" id="cntModules">0</span></label>
+        <div class="checkbox-group" id="frpvModules">
+          <label><input type="checkbox" value="1"> Модуль 1: Ключевые общешкольные дела</label>
+          <label><input type="checkbox" value="2"> Модуль 2: Классное руководство</label>
+          <label><input type="checkbox" value="3"> Модуль 3: Курсы ВУД</label>
+          <label><input type="checkbox" value="4"> Модуль 4: Школьный урок</label>
+          <label><input type="checkbox" value="5"> Модуль 5: Работа с родителями</label>
+          <label><input type="checkbox" value="6"> Модуль 6: Самоуправление</label>
+          <label><input type="checkbox" value="7"> Модуль 7: Профориентация</label>
+          <label><input type="checkbox" value="8"> Модуль 8: Школьные медиа</label>
+          <label><input type="checkbox" value="9"> Модуль 9: Предметно-эстетическая среда</label>
+          <label><input type="checkbox" value="10"> Модуль 10: Экскурсии, походы</label>
+        </div>
+        <div class="hint">Если ничего не выбрано — будут указаны все модули</div>
+      </div>
+
+      <div class="field">
+        <label>Направления воспитания ФОП <span class="counter" id="cntFop">0</span></label>
+        <div class="checkbox-group" id="fopDirections">
+          <label><input type="checkbox" value="гражданского"> гражданское</label>
+          <label><input type="checkbox" value="патриотического"> патриотическое</label>
+          <label><input type="checkbox" value="духовно-нравственного"> духовно-нравственное</label>
+          <label><input type="checkbox" value="эстетического"> эстетическое</label>
+          <label><input type="checkbox" value="физического"> физическое</label>
+          <label><input type="checkbox" value="трудового"> трудовое</label>
+          <label><input type="checkbox" value="экологического"> экологическое</label>
+          <label><input type="checkbox" value="ценности научного познания"> ценности научного познания</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="region">
+      <div class="field">
+        <label>Регион / город</label>
+        <input type="text" id="region" placeholder="Самарская область, Пенза, Москва...">
+      </div>
+
+      <div class="field">
+        <label>Сезонность / календарные даты</label>
+        <select id="season">
+          <option value="auto">Автоматически по периоду</option>
+          <option value="sept_oct">Сентябрь-октябрь (День учителя, День народного единства)</option>
+          <option value="nov_dec">Ноябрь-декабрь (День матери, Новый год)</option>
+          <option value="jan_feb">Январь-февраль (День науки, 23 февраля)</option>
+          <option value="mar_apr">Март-апрель (8 Марта, День космонавтики)</option>
+          <option value="may_jun">Май-июнь (День Победы, День России, последний звонок)</option>
+          <option value="custom">Указать свои даты</option>
+        </select>
+      </div>
+
+      <div class="field" id="customDatesField" style="display:none;">
+        <label>Свои даты / школьные события</label>
+        <textarea id="customDates" placeholder="Юбилей школы, конкурс «Класс года», визит ветеранов..."></textarea>
+      </div>
+
+      <div class="field">
+        <label>Сквозная тема периода (опционально)</label>
+        <input type="text" id="theme" placeholder="«Экология и мы», «Традиции семьи и Родины»">
+      </div>
+    </div>
+
+    <div class="section" id="extras">
+      <div class="field">
+        <label>Особые акценты воспитания</label>
+        <div class="checkbox-group" id="accents">
+          <label><input type="checkbox" value="усилить экологическое воспитание"> экологическое воспитание</label>
+          <label><input type="checkbox" value="усилить профориентацию"> профориентация</label>
+          <label><input type="checkbox" value="усилить работу по сплочению коллектива"> сплочение коллектива</label>
+          <label><input type="checkbox" value="усилить работу с цифровой грамотностью"> цифровая грамотность</label>
+          <label><input type="checkbox" value="усилить работу по профилактике буллинга"> профилактика буллинга</label>
+          <label><input type="checkbox" value="усилить финансовую грамотность"> финансовая грамотность</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Проблемы класса (опционально)</label>
+        <textarea id="problems" placeholder="Низкий уровень сплоченности, проблемы с дисциплиной..."></textarea>
+      </div>
+
+      <div class="field">
+        <label>Предпочитаемые формы работы</label>
+        <div class="checkbox-group" id="forms">
+          <label><input type="checkbox" value="проектная деятельность"> проектная деятельность</label>
+          <label><input type="checkbox" value="активное использование ИКТ"> активное использование ИКТ</label>
+          <label><input type="checkbox" value="игровые технологии"> игровые технологии</label>
+          <label><input type="checkbox" value="дискуссии и дебаты"> дискуссии и дебаты</label>
+          <label><input type="checkbox" value="встречи с интересными людьми"> встречи с интересными людьми</label>
+          <label><input type="checkbox" value="экскурсии и походы"> экскурсии и походы</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Ресурсы / ограничения</label>
+        <select id="resources">
+          <option value="с учетом ресурсов школы">Стандартные ресурсы школы</option>
+          <option value="с учетом ограниченности ресурсов">Ограниченные ресурсы</option>
+          <option value="с учетом широких возможностей школы и партнеров">Широкие возможности</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn-primary" onclick="generatePrompt()">🔄 Сформировать промпт</button>
+      <button class="btn-danger" onclick="resetForm()">🗑 Очистить</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>📄 Готовый промпт</h2>
+    <div class="preview" id="preview">Нажмите «Сформировать промпт», чтобы увидеть результат...</div>
+    <div class="btn-group">
+      <button class="btn-copy" onclick="copyPrompt()">📋 Копировать</button>
+      <button class="btn-secondary" onclick="downloadPrompt()">💾 Скачать .txt</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Готово!</div>
+<div class="credit-bar"><span>✨ Создано в конструкторе промптов для плана воспитательной работы</span></div>
+
+<script>
+/* 🔒 БЛОК ЗАЩИТЫ */
+document.addEventListener('contextmenu', function(e) {
+  e.preventDefault();
+  showToast('🔒 Контекстное меню отключено');
+  return false;
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); showToast('🔒 Доступ запрещён'); return false; }
+  if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) { e.preventDefault(); showToast('🔒 Доступ запрещён'); return false; }
+  if (e.ctrlKey && (e.key === 'u' || e.key === 'U')) {
+    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') { e.preventDefault(); showToast('🔒 Просмотр кода отключён'); return false; }
+  }
+  if (e.ctrlKey && (e.key === 's' || e.key === 'S')) { e.preventDefault(); showToast('💾 Используйте кнопку «Скачать .txt»'); return false; }
+  if (e.ctrlKey && (e.key === 'p' || e.key === 'P')) { e.preventDefault(); showToast('🖨 Печать отключена'); return false; }
+});
+
+document.addEventListener('selectstart', function(e) {
+  if (!e.target.closest('input, textarea, .preview')) { e.preventDefault(); return false; }
+});
+
+document.addEventListener('dragstart', function(e) { e.preventDefault(); });
+
+if (window.top !== window.self) {
+  try { window.top.location = window.self.location; } catch(e) {
+    document.body.innerHTML = '<div style="padding:40px;text-align:center;font-family:sans-serif;"><h2>🔒 Доступ запрещён</h2><p>Этот инструмент нельзя открывать внутри другого сайта.</p></div>';
+  }
+}
+
+document.addEventListener('copy', function(e) {
+  var activeEl = document.activeElement;
+  var allowed = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.classList.contains('preview'));
+  if (!allowed) { e.preventDefault(); showToast('🔒 Копирование интерфейса запрещено'); }
+});
+
+/* ОСНОВНОЙ ФУНКЦИОНАЛ */
+try { if (window.vkBridge) { vkBridge.send('VKWebAppInit'); } } catch(e) {}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  function setupCounter(groupId, counterId) {
+    var group = document.getElementById(groupId);
+    var counter = document.getElementById(counterId);
+    if (group && counter) {
+      group.addEventListener('change', function() {
+        counter.textContent = group.querySelectorAll('input:checked').length;
+      });
+    }
+  }
+  setupCounter('personalResults', 'cntPersonal');
+  setupCounter('frpvModules', 'cntModules');
+  setupCounter('fopDirections', 'cntFop');
+
+  var seasonSelect = document.getElementById('season');
+  if (seasonSelect) {
+    seasonSelect.addEventListener('change', function(e) {
+      var customField = document.getElementById('customDatesField');
+      if (customField) { customField.style.display = e.target.value === 'custom' ? 'block' : 'none'; }
+    });
+  }
+});
+
+function getChecked(id) {
+  var element = document.getElementById(id);
+  if (!element) return [];
+  return Array.from(element.querySelectorAll('input:checked')).map(function(i) { return i.value; });
+}
+
+function periodName(type, num) {
+  var map = {
+    quarter: {1:'четверть',2:'четверть',3:'четверть',4:'четверть'},
+    halfyear: {1:'полугодие',2:'полугодие'},
+    trimester: {1:'триместр',2:'триместр',3:'триместр'},
+    month: {1:'месяц',2:'месяц',3:'месяц',4:'месяц'}
+  };
+  return (map[type] && map[type][num]) ? map[type][num] : 'период';
+}
+
+function seasonText(val) {
+  var map = {
+    'auto': 'Учти сезонность и основные календарные даты указанного периода',
+    'sept_oct': 'Учти сезонность и основные календарные даты сентября-октября (День учителя, День народного единства и т.д.)',
+    'nov_dec': 'Учти сезонность и основные календарные даты ноября-декабря (День матери, Новый год и т.д.)',
+    'jan_feb': 'Учти сезонность и основные календарные даты января-февраля (День науки, 23 февраля и т.д.)',
+    'mar_apr': 'Учти сезонность и основные календарные даты марта-апреля (8 Марта, День космонавтики и т.д.)',
+    'may_jun': 'Учти сезонность и основные календарные даты мая-июня (День Победы, День России, последний звонок и т.д.)'
+  };
+  return map[val] || 'Учти сезонность и основные календарные даты указанного периода';
+}
+
+function generatePrompt() {
+  try {
+    var teacherName = (document.getElementById('teacherName').value || '').trim();
+    var schoolName = (document.getElementById('schoolName').value || '').trim();
+    var planType = document.getElementById('planType').value || 'quarter';
+    var periodNum = document.getElementById('periodNum').value || '1';
+    var yearStart = document.getElementById('yearStart').value || '2026';
+    var yearEnd = parseInt(yearStart) + 1;
+    var grade = document.getElementById('grade').value || '5';
+    var gradeLetter = (document.getElementById('gradeLetter').value || '').trim();
+    var fgosLevel = document.getElementById('fgosLevel').value || 'ООО';
+    var region = (document.getElementById('region').value || '').trim();
+    var season = document.getElementById('season').value || 'auto';
+    var customDates = (document.getElementById('customDates').value || '').trim();
+    var theme = (document.getElementById('theme').value || '').trim();
+    var problems = (document.getElementById('problems').value || '').trim();
+    var resources = document.getElementById('resources').value || 'с учетом ресурсов школы';
+
+    var personal = getChecked('personalResults');
+    var modules = getChecked('frpvModules');
+    var fopDirs = getChecked('fopDirections');
+    var accents = getChecked('accents');
+    var forms = getChecked('forms');
+
+    var periodStr = '';
+    if (planType === 'year') {
+      periodStr = yearStart + '/' + yearEnd + ' учебный год';
+    } else {
+      periodStr = periodNum + ' ' + periodName(planType, periodNum) + ' ' + yearStart + '/' + yearEnd + ' учебного года';
+    }
+
+    var classStr = grade + (gradeLetter ? gradeLetter : '') + ' класса';
+    var schoolContext = schoolName ? ' в ' + schoolName : '';
+    var teacherContext = teacherName ? '\nКлассный руководитель: ' + teacherName + '.' : '';
+
+    var personalText = '';
+    if (personal.length === 0) {
+      personalText = 'сделай акцент на все направления (гражданственность, патриотизм, уважение к закону, Родине, семье; экологическая культура; трудолюбие; ценности ЗОЖ; эстетическое развитие; коммуникативность; критическое мышление; цифровая грамотность)';
+    } else {
+      personalText = 'сделай акцент на: ' + personal.join(', ');
+    }
+
+    var moduleNames = {
+      '1': 'Ключевые общешкольные дела', '2': 'Классное руководство',
+      '3': 'Курсы внеурочной деятельности (ВУД)', '4': 'Школьный урок (воспитательный потенциал)',
+      '5': 'Работа с родителями', '6': 'Самоуправление', '7': 'Профориентация',
+      '8': 'Школьные медиа', '9': 'Организация предметно-эстетической среды',
+      '10': 'Экскурсии, экспедиции, походы'
+    };
+
+    var modulesText = '';
+    if (modules.length === 0) {
+      modulesText = 'План должен охватывать все модули Федеральной рабочей программы воспитания (ФРПВ), интегрированной в ООП школы:\n' +
+        'Модуль 1: Ключевые общешкольные дела.\n' +
+        'Модуль 2: Классное руководство.\n' +
+        'Модуль 3: Курсы внеурочной деятельности (ВУД).\n' +
+        'Модуль 4: Школьный урок (воспитательный потенциал).\n' +
+        'Модуль 5: Работа с родителями.\n' +
+        'Модуль 6: Самоуправление.\n' +
+        'Модуль 7: Профориентация.\n' +
+        'Модуль 8: Школьные медиа.\n' +
+        'Модуль 9: Организация предметно-эстетической среды.\n' +
+        'Модуль 10: Экскурсии, экспедиции, походы.';
+    } else {
+      modulesText = 'План должен охватывать все модули Федеральной рабочей программы воспитания (ФРПВ), интегрированной в ООП школы, но особо сделай акцент на: ' +
+        modules.map(function(m) { return 'Модуль ' + m + ': ' + (moduleNames[m] || 'неизвестный модуль'); }).join('; ');
+    }
+
+    var fopText = '';
+    if (fopDirs.length > 0) {
+      fopText = '\n3. Соответствие ФОП ' + fgosLevel + ': план должен содержать все направления воспитания, а именно: ' +
+        fopDirs.map(function(d) { return d + ' воспитания'; }).join(', ') + '.';
+    }
+
+    var accentsText = accents.length > 0 ? '\nОсобые акценты: ' + accents.join(', ') + '.' : '';
+    var formsText = forms.length > 0 ? '\nПредпочитаемые формы работы: ' + forms.join(', ') + '.' : '';
+    var regionText = region ? '\n5. Региональный компонент: По возможности, включи темы, связанные с историей, культурой, экологией ' + region + '.' : '';
+
+    var seasonTextVal = '';
+    if (season === 'custom' && customDates) {
+      seasonTextVal = 'Учти следующие календарные даты и школьные события: ' + customDates + '.';
+    } else if (season !== 'auto') {
+      seasonTextVal = seasonText(season) + '.';
+    } else {
+      seasonTextVal = 'Учти сезонность (если период — четверть/месяц) и основные календарные даты (День учителя, День народного единства и т.д.).';
+    }
+
+    var themeText = theme ? 'Дополнительно выдели сквозную тему: «' + theme + '».' : '';
+    var problemsText = problems ? '\nКонкретные проблемы класса, на которые стоит обратить внимание: ' + problems + '.' : '';
+
+    var prompt = `Действуй как опытный методист и классный руководитель. Мне нужен детальный план воспитательной работы на ${periodStr} для ${classStr}${schoolContext}.${teacherContext}
+
+Ключевые требования:
+1. Соответствие ФГОС ${fgosLevel}: учет требований к личностным результатам обучающихся — ${personalText}.
+2. Соответствие ФООП: ${modulesText}${fopText}
+3. Возрастные особенности: Учет специфики развития и интересов учащихся ${classStr}.
+4. Практическая реализуемость: Мероприятия должны быть выполнимы в условиях школы и класса, ${resources}.${regionText}${accentsText}${formsText}
+
+Структура плана (предложи):
+1. Цель и задачи воспитательной работы на указанный период (сформулируй четко, измеримо, соотнеси с личностными результатами ФГОС и задачами ФРПВ).
+2. Анализ текущей ситуации (кратко): Характеристика класса (уровень сплоченности, основные достижения/проблемы, социальный состав). [Примечание: Этот пункт классный руководитель заполнит сам, но ты можешь предложить ключевые аспекты для анализа].${problemsText}
+3. Тематический блок/Направления работы (на период): охвати основные направления согласно ФРПВ и ФОП (патриотическое, духовно-нравственное, экологическое, ЗОЖ, трудовое, эстетическое, профориентационное и т.д.). ${themeText}
+4. Календарный план мероприятий (основная часть):
+   Формат таблицы:
+   - Сроки (Дата/Неделя)
+   - Мероприятие (Название, краткое описание формы: классный час, экскурсия, акция, беседа, проект, встреча с интересным человеком и т.д.)
+   - Цель и Задачи конкретного мероприятия (Что хотим достичь? Какие аспекты личности развиваем?)
+   - Основное содержание / Ключевые вопросы (О чем будем говорить/делать?)
+   - Форма организации (Беседа, дискуссия, игра, практикум, экскурсия, конкурс, проект и т.д.)
+   - Охват модулей ФРПВ (Укажи номера модулей, которые реализуются через это мероприятие: 1, 2, 5, 7 и т.д.)
+   - Ответственные (Классный руководитель, актив класса, родители, соц. педагог, библиотекарь и т.д.)
+   - Ожидаемый результат (конкретный и наблюдаемый) (Что должны продемонстрировать ученики? Какие навыки/знания/отношения проявят?)
+   - Ресурсы (по необходимости) (Материалы, ссылки, места проведения).
+5. Работа с родителями: Конкретные мероприятия (родительское собрание, консультации, совместные мероприятия, онлайн-взаимодействие) с указанием сроков, тем и целей. Свяжи с Модулем 5 ФРПВ.
+6. Работа с активом класса / Самоуправление: Планируемые действия по развитию самоуправления (собрания актива, поручения, проекты). Свяжи с Модулем 6 ФРПВ.
+7. Диагностика и рефлексия: Как будешь отслеживать эффективность? (Наблюдение, анкетирование, анализ активности, портфолио, беседы). Запланируй моменты рефлексии с классом.
+
+Дополнительные пожелания:
+- Предложи 2-3 конкретных идеи для интерактивных и современных мероприятий (квизы, челленджи, мини-проекты с цифровым компонентом, встречи онлайн).
+- Включи элементы профориентации (Модуль 7 ФРПВ), актуальные для ${classStr}.
+- ${seasonTextVal}
+- Предложи варианты интеграции воспитательных задач в урочную деятельность (Модуль 4 ФРПВ) по разным предметам.
+- Упомяни о важности индивидуальной работы с обучающимися (одаренными, с ОВЗ, «трудными»).
+- Полезные ресурсы: Порекомендуй 3-5 надежных онлайн-ресурсов с материалами для классных часов и мероприятий по ФГОС/ФООП (сайты, платформы).
+
+Ожидаемый результат: Полноценный, структурированный, готовый к адаптации план воспитательной работы на указанный период, соответствующий требованиям ФГОС и ФООП, с четкой привязкой к модулям ФРПВ и возрастным особенностям класса. План должен быть практичным и содержать конкретные, разнообразные мероприятия.
+
+— Промпт сформирован в конструкторе для плана воспитательной работы.`;
+
+    document.getElementById('preview').textContent = prompt;
+    showToast('✅ Промпт сформирован!');
+  } catch (error) {
+    console.error('Ошибка генерации промпта:', error);
+    showToast('❌ Ошибка: ' + error.message);
+  }
+}
+
+function copyPrompt() {
+  var previewElement = document.getElementById('preview');
+  if (!previewElement) return;
+
+  var text = previewElement.textContent;
+  if (text.indexOf('Нажмите') === 0) {
+    showToast('Сначала сформируйте промпт!');
+    return;
+  }
+
+  var isInVK = /VKAndroidApp|VKClient|VKiPadClient/i.test(navigator.userAgent);
+
+  if (isInVK && window.vkBridge) {
+    try {
+      var result = vkBridge.send('VKWebAppCopyText', { text: text });
+      if (result && typeof result.then === 'function') {
+        result.then(function() { showToast('📋 Скопировано!'); }).catch(function() { fallbackCopy(text); });
+      } else {
+        fallbackCopy(text);
+      }
+    } catch(e) {
+      fallbackCopy(text);
+    }
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text)
+      .then(function() { showToast('📋 Скопировано!'); })
+      .catch(function() { legacyCopy(text); });
+  } else {
+    legacyCopy(text);
+  }
+}
+
+function legacyCopy(text) {
+  var textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.top = '0';
+  textarea.style.left = '0';
+  textarea.style.width = '2em';
+  textarea.style.height = '2em';
+  textarea.style.padding = '0';
+  textarea.style.border = 'none';
+  textarea.style.outline = 'none';
+  textarea.style.boxShadow = 'none';
+  textarea.style.background = 'transparent';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+  textarea.setSelectionRange(0, text.length);
+  try {
+    var ok = document.execCommand('copy');
+    if (ok) { showToast('📋 Скопировано!'); } else { showToast('❌ Не удалось скопировать. Выделите текст вручную.'); }
+  } catch(e) { showToast('❌ Не удалось скопировать'); }
+  document.body.removeChild(textarea);
+}
+
+function downloadPrompt() {
+  var previewElement = document.getElementById('preview');
+  if (!previewElement) return;
+  var text = previewElement.textContent;
+  if (text.indexOf('Нажмите') === 0) { showToast('Сначала сформируйте промпт!'); return; }
+  var blob = new Blob([text], {type: 'text/plain;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'prompt_plan_vospitatelnoy_raboty.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('💾 Файл скачан!');
+}
+
+function resetForm() {
+  if (!confirm('Очистить все поля?')) return;
+  document.querySelectorAll('input[type="text"], textarea').forEach(function(i) { if (i) i.value = ''; });
+  document.querySelectorAll('input[type="checkbox"]').forEach(function(i) { if (i) i.checked = false; });
+  var fields = {
+    'grade': '5', 'yearStart': '2026', 'fgosLevel': 'ООО',
+    'planType': 'quarter', 'periodNum': '1', 'season': 'auto',
+    'resources': 'с учетом ресурсов школы'
+  };
+  Object.keys(fields).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = fields[id];
+  });
+  document.querySelectorAll('.counter').forEach(function(c) { if (c) c.textContent = '0'; });
+  document.getElementById('preview').textContent = 'Нажмите «Сформировать промпт», чтобы увидеть результат...';
+  showToast('🗑 Форма очищена');
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2500);
+}
+
+window.addEventListener('load', function() { setTimeout(generatePrompt, 100); });
+</script>
+
+</body>
+</html>
